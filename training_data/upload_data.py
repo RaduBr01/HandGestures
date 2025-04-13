@@ -103,7 +103,7 @@ with mp_hands.Hands(
 
                 # Wait for key press to save the data
                 key = cv2.waitKey(1) & 0xFF
-                if key == 27:  # ESC key to exit
+                if key == 27:  # ESC key to exitN
                     break
                 elif 65 <= key <= 90:  # ASCII values for A-Z
                     label = chr(key)

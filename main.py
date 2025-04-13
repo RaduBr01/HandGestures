@@ -1,3 +1,5 @@
+from time import sleep
+
 import cv2
 import numpy as np
 import mediapipe as mp
@@ -18,8 +20,11 @@ model = tf.keras.models.load_model(model_path)
 # Define the label map for "A", "B", "C", "D", and "E"
 label_map = {
     0: "A", 1: "B", 2: "C", 3: "D", 4: "E", 5: "F", 6: "G", 7: "H",
-    8: "I", 9: "K", 10: "L", 11: "M", 12: "N", 13: "O", 14: "P",
+    8: "I", 9: "K", 10: "L", 11: "M", 12: "N", 13: "O", 14: "P", 15: "Q",
+    16: "R", 17: "S", 18: "T", 19: "U", 20: "V", 21: "W", 22: "R", 23: "W",
+    24:"X", 25:"I", 26:"nustiuboss"
 }
+
 
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
@@ -97,7 +102,19 @@ def is_index_finger_in_top_right(landmarks, width, height):
     index_y = int(index_finger_tip[1] * height)  # y is the second element in the tuple
 
     # Check if the index finger is in the top-right corner
-    if index_x > width * 0.8 and index_y < height * 0.2:
+    if index_x > width * 0.9 and index_y < height * 0.2:
+        return True
+    return False
+
+
+def is_index_finger_in_bottom_right(landmarks, width, height):
+    # Access the index finger tip's x and y coordinates directly from the tuple
+    index_finger_tip = landmarks[8]  # Index finger tip position
+    index_x = int(index_finger_tip[0] * width)  # x is the first element in the tuple
+    index_y = int(index_finger_tip[1] * height)  # y is the second element in the tuple
+
+    # Check if the index finger is in the top-right corner
+    if index_x > width * 0.9 and index_y  > height * 0.8:
         return True
     return False
 
@@ -157,8 +174,8 @@ with mp_hands.Hands(
                 predicted_label_idx = np.argmax(prediction)
                 predicted_confidence = np.max(prediction)
                 predicted_label = label_map[predicted_label_idx]
+                print([predicted_label_idx])
 
-                print(label_map[predicted_label_idx])
 
                 # If the prediction is above confidence threshold, handle it
                 if predicted_confidence >= confidence_threshold:
@@ -168,7 +185,7 @@ with mp_hands.Hands(
                     else:
                         prediction_counter = 1  # Reset counter for a new prediction
                         last_prediction = predicted_label  # Update last prediction
-                    print(prediction_counter)
+                    #print(prediction_counter)
                     # Build the message if the same label has been predicted 4 times
                     if prediction_counter >= 16:
                         message += predicted_label  # Add the predicted label to the message
@@ -179,6 +196,11 @@ with mp_hands.Hands(
                     if message:  # Only speak if there is a message to read
                         speak_message(message)
                         message = ""  # Reset the message after speaking
+
+                if is_index_finger_in_bottom_right(landmarks, width, height):
+                    if message:  # Only speak if there is a message to read
+                        message=message[0:len(message)-1]
+                        sleep(0.5)
 
                 # Display the string being built on the screen
                 cv2.putText(image, f"Message: {message}", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)

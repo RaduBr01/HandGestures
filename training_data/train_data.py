@@ -39,19 +39,21 @@ X = X / np.linalg.norm(X, axis=1, keepdims=True)
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-print(len(np.unique(y)),"   ",  len(X))
+print(len(y),"   ",  len(X))
+print(X.shape[1])
 # Build the model
 model = Sequential([
     Dense(128, input_shape=(X.shape[1] ,), activation='relu'),
     Dropout(0.3),
     Dense(64, activation='relu'),
     Dropout(0.3),
-    Dense(len(y), activation='softmax')  # Output layer for multi-class classification (3 classes)
+    Dense(27, activation='softmax')  # Output layer for multi-class classification (3 classes)
 ])
 
 model.compile(optimizer=Adam(), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-# Train the model
+
+
 model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
 
 # Save the model
